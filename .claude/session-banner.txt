@@ -1,0 +1,12 @@
+=== NHPID Session Briefing ===
+
+SYSTEM: Oracle | Schemas: NHPID_VAL_OWNER / NHPDWEB_OWNER
+
+KEY REMINDERS:
+1. Oracle syntax ONLY — never use MySQL syntax
+2. Bilingual pattern: DECODE(NVL(#{lang},'en'),'en',col_eng,'fr',col_fr)
+3. Test in NHPID_VAL_OWNER before touching NHPDWEB_OWNER
+4. DDL causes implicit COMMIT in Oracle — be careful with transactions
+5. QueryMapper.xml: namespace ca.gc.hc.nhpd.webservice.mapper.QueryMapper
+
+BEFORE ANY SQL: Read docs/NHPID_Technical_Reference.md
