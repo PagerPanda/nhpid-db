@@ -12,6 +12,10 @@ Read this before ANY SQL or schema work. It contains:
 - Known issues and diagnostic patterns
 - Loader package (NHPID_X$LOADER) reference
 
+### Companion Documentation
+- `docs/NHPID_Conversation_Extraction_Notes.md` — archive-processing notes, conversation inventory, filtering scripts
+- `docs/NHPID_Knowledge_Base_Ingestion.md` — vector DB ingestion plan, chunking strategy, metadata tagging
+
 ---
 
 ## CRITICAL RULES — MANDATORY BEFORE WRITING ANY SQL
@@ -48,7 +52,7 @@ Read this before ANY SQL or schema work. It contains:
 /procedures  → Stored procedures and packages
 /migrations  → One-time data migration and backfill scripts
 /queries     → Debug, reporting, and investigation queries
-/docs        → Reference documentation
+/docs        → Technical reference, extraction notes, ingestion plan
 ```
 
 ## File Naming Convention
