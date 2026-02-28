@@ -4,7 +4,7 @@ SQL scripts for backend development on the Natural Health Products Ingredient Da
 
 - **DB Engine:** Oracle
 - **Primary Schemas:** `NHPID_VAL_OWNER`, `NHPDWEB_OWNER`
-- **Loader Schema:** `NHPID_X$LOADER`
+- **Validation Loader Package:** `NHPID_VAL_OWNER.NHPID_X$LOADER`
 - **Web Service Layer:** Java/Spring + MyBatis (`QueryMapper.xml`)
 
 ## Structure
@@ -20,7 +20,11 @@ SQL scripts for backend development on the Natural Health Products Ingredient Da
 
 ## Reference
 
-See `docs/NHPID_Technical_Reference.md` for full schema documentation, QueryMapper.xml inventory, and known issues.
+| Document | Description |
+|----------|-------------|
+| `docs/NHPID_Technical_Reference.md` | Core technical primer — schema hierarchy, QueryMapper.xml inventory, loader package reference, troubleshooting |
+| `docs/NHPID_Conversation_Extraction_Notes.md` | Archive-processing notes — conversation inventory, filtering scripts, keyword strategy |
+| `docs/NHPID_Knowledge_Base_Ingestion.md` | Knowledge-base ingestion plan — chunking, embedding, vector DB setup |
 
 ## Claude Code
 
