@@ -3,16 +3,14 @@
 ## Who I Am
 Lead backend developer on the Government of Canada Health Canada NHPID (Natural Health Products Ingredient Database) — Oracle, schemas `NHPID_VAL_OWNER` / `NHPDWEB_OWNER`.
 
-## Full Technical Reference
-@docs/NHPID_Technical_Reference.md
+## Technical Reference (auto-loaded)
+@docs/NHPID_Quick_Reference.md
 
-Read this before ANY SQL or schema work. It contains:
-- Schema hierarchy and key objects
-- Complete QueryMapper.xml SQL inventory
-- Known issues and diagnostic patterns
-- Loader package (NHPID_X$LOADER) reference
+Schema hierarchy, key object names, layer model, and working assumptions.
+For full inventories and troubleshooting, read `docs/NHPID_Deep_Reference.md`.
 
 ### Companion Documentation
+- `docs/NHPID_Deep_Reference.md` — full inventories: QueryMapper SQL IDs, loader procedures, view column notes, troubleshooting
 - `docs/NHPID_Conversation_Extraction_Notes.md` — archive-processing notes, conversation inventory, filtering scripts
 - `docs/NHPID_Knowledge_Base_Ingestion.md` — vector DB ingestion plan, chunking strategy, metadata tagging
 
@@ -67,7 +65,7 @@ queries/    debug_<description>.sql
 ---
 
 ## Working Instructions
-- Always verify column/object names against `docs/NHPID_Technical_Reference.md` before writing SQL
+- Always verify column/object names against `docs/NHPID_Deep_Reference.md` before writing SQL
 - Schema changes: DDL first → views second → procedures third
 - Never refactor existing working queries unless explicitly asked
 - When in doubt about a table or column, say so — do not invent names

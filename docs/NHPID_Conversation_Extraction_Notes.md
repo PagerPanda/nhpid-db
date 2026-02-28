@@ -129,7 +129,8 @@ If a conversation clearly spans BTS and NHPID:
 ---
 ## 6. FILE ORGANIZATION SUGGESTION
 Suggested separation:
-- `NHPID_Technical_Reference_v2.md` — core technical primer
+- `NHPID_Quick_Reference.md` — core quick reference (auto-loaded)
+- `NHPID_Deep_Reference.md` — full inventories and troubleshooting
 - `NHPID_Conversation_Extraction_Notes.md` — archive and extraction notes
 - `NHPID_Knowledge_Base_Ingestion.md` — vector DB / chunking / embedding plan
 This keeps runtime truth separate from archive-processing operations.

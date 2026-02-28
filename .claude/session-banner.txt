@@ -9,4 +9,4 @@ KEY REMINDERS:
 4. DDL causes implicit COMMIT in Oracle — be careful with transactions
 5. QueryMapper.xml: namespace ca.gc.hc.nhpd.webservice.mapper.QueryMapper
 
-BEFORE ANY SQL: Read docs/NHPID_Technical_Reference.md
+BEFORE ANY SQL: Read docs/NHPID_Deep_Reference.md

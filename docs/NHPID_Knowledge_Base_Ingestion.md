@@ -15,7 +15,8 @@ It is **not** a source of truth for NHPID runtime behaviour.
 - extracted NHPID `.md` files from prior conversation processing
 - future filtered NHPID archive files such as `conversations-006-nhpid.json`
 - companion reference files such as:
-  - `NHPID_Technical_Reference_v2.md`
+  - `NHPID_Quick_Reference.md`
+  - `NHPID_Deep_Reference.md`
   - `NHPID_Conversation_Extraction_Notes.md`
 ### Recommended separation
 Do not merge these categories blindly:

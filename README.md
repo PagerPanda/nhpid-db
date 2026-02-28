@@ -22,7 +22,8 @@ SQL scripts for backend development on the Natural Health Products Ingredient Da
 
 | Document | Description |
 |----------|-------------|
-| `docs/NHPID_Technical_Reference.md` | Core technical primer — schema hierarchy, QueryMapper.xml inventory, loader package reference, troubleshooting |
+| `docs/NHPID_Quick_Reference.md` | Quick reference (auto-loaded) — schema hierarchy, key object names, layer model, working assumptions |
+| `docs/NHPID_Deep_Reference.md` | Deep reference (on-demand) — full QueryMapper inventory, loader procedures, view column notes, troubleshooting |
 | `docs/NHPID_Conversation_Extraction_Notes.md` | Archive-processing notes — conversation inventory, filtering scripts, keyword strategy |
 | `docs/NHPID_Knowledge_Base_Ingestion.md` | Knowledge-base ingestion plan — chunking, embedding, vector DB setup |
 

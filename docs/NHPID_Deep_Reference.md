@@ -1,70 +1,47 @@
-# NHPID Technical Reference
+# NHPID Deep Reference
 
-> Context primer for coding, troubleshooting, and system reasoning on the NHPID system.
-> Revised from prior extracted notes and corrected against established NHPID session context.
-> **Important:** inventories below are **selective, not exhaustive**, unless explicitly stated otherwise.
-
----
-
-## 1. SYSTEM OVERVIEW
-
-### NHPID — Natural Health Products Ingredient Database
-
-| Property                       | Value                                         |
-| ------------------------------ | --------------------------------------------- |
-| **DB Engine**                  | Oracle                                        |
-| **Primary Schemas**            | `NHPDWEB_OWNER`, `NHPID_VAL_OWNER`            |
-| **Validation Loader Package**  | `NHPID_VAL_OWNER.NHPID_X$LOADER`              |
-| **Web Service Layer**          | Java / Spring + MyBatis                       |
-| **Primary Mapper File**        | `QueryMapper.xml`                             |
-| **Mapper Namespace**           | `ca.gc.hc.nhpd.webservice.mapper.QueryMapper` |
-| **Primary SQL Client (local)** | Oracle SQL Developer                          |
-
-### Core system model
-
-* `NHPDWEB_OWNER` provides key web-facing views and supporting objects used by the service layer.
-* `NHPID_VAL_OWNER` contains the validation-layer objects, including `X$*` validation tables and the loader package `NHPID_X$LOADER`.
-* `QueryMapper.xml` is the authoritative mapper reference for PLA / population-service query behaviour.
-* `NHPID_VAL_OWNER.NHPID_X$LOADER` is the authoritative reference for how validation-layer `X$*` tables are populated and refreshed.
+> Detailed inventories, troubleshooting, and column notes.
+> Quick-start reference: `docs/NHPID_Quick_Reference.md`
+> **Important:** inventories below are **selective, not exhaustive**.
 
 ---
 
-## 2. SCHEMA / LAYER MODEL
+## 1. KEY WEB-FACING VIEWS / LOOKUPS (`NHPDWEB_OWNER`) — FULL COLUMN NOTES
 
-```text
-NHPDWEB_OWNER
-  - web-service / population-service facing views and supporting objects
+> Selective inventory based on prior established usage. Column notes are preserved where they were already useful.
 
-NHPID_VAL_OWNER
-  - validation-layer schema
-  - contains validation X$* tables
-  - contains package NHPID_X$LOADER
+| View / Object                 | Description / Notes                                                                                                                                |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `V_MONOGRAPHS`                | All monographs; key columns noted previously include `MONO_CODE`, `MONO_NAME_ENG`, `MONO_NAME_FR`, `PCI`, `VALIDATION_READY_DATE`                  |
+| `V_MONOGRAPH_ROA`             | Monograph ↔ route of administration                                                                                                                |
+| `V_ASSESSMENT_DOSE_SUB_POP`   | Dose sub-population data                                                                                                                           |
+| `V_ASSESSMENT_DOSES`          | Assessment doses; prior notes reference `ASSESSMENT_DOSE_ID`, `MONO_CODE`, `INGREDIENT_ID`                                                         |
+| `V_SUB_POPULATION_GROUPS`     | Sub-population groups (e.g., age grouping)                                                                                                         |
+| `V_SUB_POPULATION_SEXES`      | Sex groups                                                                                                                                         |
+| `V_SUB_POPULATION_CONDITIONS` | Female conditions / sub-population conditions                                                                                                      |
+| `V_UNITS_OF_MEASURE`          | Units lookup; prior notes reference `UNIT_CODE`, `UNIT_TYPE_CODE`, `PREFERRED`, `RATIO_TO_BASE`, `UNIT_NAME_ENG`, `UNIT_NAME_FR`                   |
+| `V_DOSAGE_FORMS`              | Dosage forms; prior notes reference `DOSAGE_FORM_CODE`, `DOSEFRM_ID`, `ALLOW_INGREDIENT_UNITS`, `NMI_REQUIRED`, `DISCRETE`, `VALID_FOR_COMPENDIAL` |
+| `V_DOSAGE_FORM_UNITS`         | Dosage form ↔ units                                                                                                                                |
+| `V_ROA_DOSAGE_FORMS`          | ROA ↔ dosage-form combinations and related population fields, including DFU / min-age fields where applicable                                      |
+| `V_MONO_ROA_DOSAGE_FORM`      | Monograph-specific ROA + dosage forms; prior note referenced `HAS_NULL`                                                                            |
+| `V_MONO_FORM_TYPES`           | Monograph form types                                                                                                                               |
+| `V_STANDARD_GRADE_REFERENCES` | Standard-grade references; prior note referenced `STAND_GRADE_REF_IS_HOMEOPATHIC`                                                                  |
+| `V_UOM_BY_INGRED_CLASS_TYPE`  | Units filtered by ingredient class / type                                                                                                          |
+| `COMMON_TERMS`                | Common terms lookup; prior notes reference `COMMONTERMTYPE_ID`, `COMMONTERM_CODE`                                                                  |
+| `COUNTRIES`                   | Country lookup                                                                                                                                     |
+| `PROVINCES_STATES`            | Province / state lookup                                                                                                                            |
+| `DOSAGE_UNITS`                | Dosage-unit lookup; prior notes reference `ADD_DOSEUNIT_INFO`, `DOSAGEUNIT_CODE`                                                                   |
+| `ADMINISTRATION_ROUTES`       | Administration-route lookup; prior notes reference `ADMINRT_CODE`, `ADMINRT_ID`, `ADMINRT_STERILEREQUIRED`                                         |
+| `APPLICATION_PROPERTIES_VAL`  | Application / property configuration; prior notes reference `KEY`, `DATA`, `FLAG`                                                                  |
 
-NHPID_VAL_OWNER.NHPID_X$LOADER
-  - PL/SQL validation-layer loader package
-  - truncates / refreshes / repopulates X$* validation tables
-  - loads from X_* buffers / views and related sources
-  - refreshes dependent MV_* materialized views where applicable
-```
+### Caution
 
-### Layer distinction
-
-| Layer / Pattern  | Purpose                                                                        |
-| ---------------- | ------------------------------------------------------------------------------ |
-| `X_*`            | Buffer / upstream staging inputs used by validation ETL                        |
-| `X$*`            | Validation-layer loaded tables used by downstream validation and service logic |
-| `MV_*`           | Materialized views refreshed as part of validation-layer maintenance           |
-| `NHPID_X$LOADER` | Package bridging `X_*` inputs into `X$*` validation-layer objects              |
-
-### Authoritative references
-
-1. **`NHPID_VAL_OWNER.NHPID_X$LOADER` package body** — authoritative source for validation-layer table population / refresh behaviour
-2. **`QueryMapper.xml`** — authoritative source for PLA / population-service query logic
-3. **`NHPDWEB_OWNER` views** — primary query surface used by the web service layer
+* These column notes should be treated as **working reference notes**, not a substitute for direct DESCRIBE / source inspection.
+* When exact column naming matters for implementation, confirm against the environment.
 
 ---
 
-## 3. VALIDATION LOADER PACKAGE — `NHPID_VAL_OWNER.NHPID_X$LOADER`
+## 2. VALIDATION LOADER PACKAGE — `NHPID_VAL_OWNER.NHPID_X$LOADER`
 
 ### Purpose
 
@@ -136,65 +113,7 @@ The package includes many per-table / per-domain refresh procedures, including b
 
 ---
 
-## 4. KEY VALIDATION-LAYER OBJECTS (`NHPID_VAL_OWNER`)
-
-> This is a selective object inventory for orientation only.
-
-### Key validation `X$*` tables
-
-| Object              | Description                                       |
-| ------------------- | ------------------------------------------------- |
-| `X$ASSESSMENT_DOSE` | Validation-layer dose assessment data             |
-| `X$GROUP_RULES`     | Validation-layer group rules                      |
-| `X$MONOGRAPH_XREF`  | Monograph cross-reference data                    |
-| `X$MONOGRAPH_*`     | Monograph-related validation tables               |
-| `X$ROA_DOSAGE_FORM` | ROA ↔ dosage-form mapping in the validation layer |
-| `X_X$LOAD_LOG`      | Loader log table for status / error tracking      |
-
-### Notes
-
-* These are **validation-layer** objects, not a separate "loader schema."
-* The loader package populates / refreshes them; it is not their owner in the schema sense.
-* `X$*` should be treated as controlled validation outputs, not ad hoc scratch objects.
-
----
-
-## 5. KEY WEB-FACING VIEWS / LOOKUPS (`NHPDWEB_OWNER`)
-
-> Selective inventory based on prior established usage. Column notes are preserved where they were already useful.
-
-| View / Object                 | Description / Notes                                                                                                                                |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `V_MONOGRAPHS`                | All monographs; key columns noted previously include `MONO_CODE`, `MONO_NAME_ENG`, `MONO_NAME_FR`, `PCI`, `VALIDATION_READY_DATE`                  |
-| `V_MONOGRAPH_ROA`             | Monograph ↔ route of administration                                                                                                                |
-| `V_ASSESSMENT_DOSE_SUB_POP`   | Dose sub-population data                                                                                                                           |
-| `V_ASSESSMENT_DOSES`          | Assessment doses; prior notes reference `ASSESSMENT_DOSE_ID`, `MONO_CODE`, `INGREDIENT_ID`                                                         |
-| `V_SUB_POPULATION_GROUPS`     | Sub-population groups (e.g., age grouping)                                                                                                         |
-| `V_SUB_POPULATION_SEXES`      | Sex groups                                                                                                                                         |
-| `V_SUB_POPULATION_CONDITIONS` | Female conditions / sub-population conditions                                                                                                      |
-| `V_UNITS_OF_MEASURE`          | Units lookup; prior notes reference `UNIT_CODE`, `UNIT_TYPE_CODE`, `PREFERRED`, `RATIO_TO_BASE`, `UNIT_NAME_ENG`, `UNIT_NAME_FR`                   |
-| `V_DOSAGE_FORMS`              | Dosage forms; prior notes reference `DOSAGE_FORM_CODE`, `DOSEFRM_ID`, `ALLOW_INGREDIENT_UNITS`, `NMI_REQUIRED`, `DISCRETE`, `VALID_FOR_COMPENDIAL` |
-| `V_DOSAGE_FORM_UNITS`         | Dosage form ↔ units                                                                                                                                |
-| `V_ROA_DOSAGE_FORMS`          | ROA ↔ dosage-form combinations and related population fields, including DFU / min-age fields where applicable                                      |
-| `V_MONO_ROA_DOSAGE_FORM`      | Monograph-specific ROA + dosage forms; prior note referenced `HAS_NULL`                                                                            |
-| `V_MONO_FORM_TYPES`           | Monograph form types                                                                                                                               |
-| `V_STANDARD_GRADE_REFERENCES` | Standard-grade references; prior note referenced `STAND_GRADE_REF_IS_HOMEOPATHIC`                                                                  |
-| `V_UOM_BY_INGRED_CLASS_TYPE`  | Units filtered by ingredient class / type                                                                                                          |
-| `COMMON_TERMS`                | Common terms lookup; prior notes reference `COMMONTERMTYPE_ID`, `COMMONTERM_CODE`                                                                  |
-| `COUNTRIES`                   | Country lookup                                                                                                                                     |
-| `PROVINCES_STATES`            | Province / state lookup                                                                                                                            |
-| `DOSAGE_UNITS`                | Dosage-unit lookup; prior notes reference `ADD_DOSEUNIT_INFO`, `DOSAGEUNIT_CODE`                                                                   |
-| `ADMINISTRATION_ROUTES`       | Administration-route lookup; prior notes reference `ADMINRT_CODE`, `ADMINRT_ID`, `ADMINRT_STERILEREQUIRED`                                         |
-| `APPLICATION_PROPERTIES_VAL`  | Application / property configuration; prior notes reference `KEY`, `DATA`, `FLAG`                                                                  |
-
-### Caution
-
-* These column notes should be treated as **working reference notes**, not a substitute for direct DESCRIBE / source inspection.
-* When exact column naming matters for implementation, confirm against the environment.
-
----
-
-## 6. QUERYMAPPER.XML REFERENCE
+## 3. QUERYMAPPER.XML REFERENCE
 
 **File:** `QueryMapper.xml`
 **Namespace:** `ca.gc.hc.nhpd.webservice.mapper.QueryMapper`
@@ -268,7 +187,30 @@ This section is a **working inventory**, not a substitute for the live mapper fi
 
 ---
 
-## 7. TROUBLESHOOTING NOTES
+## 4. KEY VALIDATION-LAYER OBJECTS (`NHPID_VAL_OWNER`) — FULL NOTES
+
+> This is a selective object inventory for orientation only.
+
+### Key validation `X$*` tables
+
+| Object              | Description                                       |
+| ------------------- | ------------------------------------------------- |
+| `X$ASSESSMENT_DOSE` | Validation-layer dose assessment data             |
+| `X$GROUP_RULES`     | Validation-layer group rules                      |
+| `X$MONOGRAPH_XREF`  | Monograph cross-reference data                    |
+| `X$MONOGRAPH_*`     | Monograph-related validation tables               |
+| `X$ROA_DOSAGE_FORM` | ROA ↔ dosage-form mapping in the validation layer |
+| `X_X$LOAD_LOG`      | Loader log table for status / error tracking      |
+
+### Notes
+
+* These are **validation-layer** objects, not a separate "loader schema."
+* The loader package populates / refreshes them; it is not their owner in the schema sense.
+* `X$*` should be treated as controlled validation outputs, not ad hoc scratch objects.
+
+---
+
+## 5. TROUBLESHOOTING NOTES
 
 ### Package resolution / execute troubleshooting for `NHPID_VAL_OWNER.NHPID_X$LOADER`
 
@@ -329,65 +271,4 @@ Do **not** assume the package body itself is invalid unless object status confir
 
 ---
 
-## 8. WORKING ASSUMPTIONS / IMPLEMENTATION NOTES
-
-### Safe assumptions from prior context
-
-* Oracle remains the authoritative storage / query engine for NHPID technical work discussed here.
-* `NHPID_VAL_OWNER.NHPID_X$LOADER` is the authoritative validation-loader package.
-* `QueryMapper.xml` is the authoritative population / PLA service query reference.
-* `NHPDWEB_OWNER` views are central to service-layer lookups and bilingual query patterns.
-* Loader / mapper inventories in this document are **selective** and should be expanded from source when deeper implementation work begins.
-
-### Things to verify directly when coding
-
-* exact object ownership in the current environment
-* exact column names / case / aliases
-* exact mapper predicates and joins
-* existence and signature of any specific package entry point you plan to call
-* dependencies between refresh procedures and materialized views
-
----
-
-## 9. WHAT WAS INTENTIONALLY REMOVED FROM V1
-
-The following content was intentionally removed from the technical reference because it belongs in a separate archive / ingestion note, not the system reference itself:
-
-* conversation inventories
-* `conversations-006.json` splitting / filtering instructions
-* vector DB integration plan
-* extraction workflow notes
-* personal role / operator-context notes
-
-Those can live in a separate document such as:
-
-* `NHPID_Conversation_Extraction_Notes.md`
-* `NHPID_Knowledge_Base_Ingestion.md`
-
----
-
-## 10. SUMMARY
-
-### What this document is
-
-A corrected **technical context primer** for NHPID architecture, validation-loader reasoning, web-service query reasoning, and common troubleshooting.
-
-### What it is not
-
-* not a full data dictionary
-* not a complete object inventory
-* not a complete QueryMapper dump
-* not an environment-specific deployment guide
-
-### Primary mental model
-
-If you need to reason about NHPID quickly:
-
-1. **Use `QueryMapper.xml`** for population / service query behaviour
-2. **Use `NHPID_VAL_OWNER.NHPID_X$LOADER`** for validation-layer population / refresh behaviour
-3. **Use `NHPDWEB_OWNER` views** as the primary service-facing query surface
-4. **Treat `X_*` and `X$*` as distinct layers** — upstream buffer inputs vs validation-layer outputs
-
----
-
-*Updated: 2026-02-28 | Corrected v2 from prior extracted NHPID reference*
+*On-demand tier. Quick reference: `docs/NHPID_Quick_Reference.md`*
